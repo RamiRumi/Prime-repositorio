@@ -1,0 +1,102 @@
+import os
+from typing import List, Optional
+
+class FileManager:
+    def __init__(self, filename: str):
+        self.filename = filename
+        self.content: List[str] = [
+            "Hola, espero que estes bien\n",
+            "Gracias por ver este codigo\n",
+            "Tengo muchos deberes que hacer me ayudas?\n",
+            "Que tengas un buen dia\n",
+            "bye\n"
+        ]
+
+    def write_to_file(self) -> None:
+        "Escribe las notas predefinidas en el archivo."
+        try:
+            with open(self.filename, 'w', encoding='utf-8') as file:
+                file.writelines(self.content)
+            print(f"Se ha escrito exitosamente en el archivo {self.filename}")
+        except IOError as e:
+            print(f"Error al escribir en el archivo: {e}")
+
+    def read_file(self) -> None:
+        "Lee el contenido del archivo línea por línea."
+        try:
+            with open(self.filename, 'r', encoding='utf-8') as file:
+                self.content = file.readlines()
+            print(f"Se ha leído exitosamente el archivo {self.filename}")
+        except IOError as e:
+            print(f"Error al leer el archivo: {e}")
+
+    def display_line(self, line_number: int) -> Optional[str]:
+        "Muestra una línea específica del archivo."
+        if 1 <= line_number <= len(self.content):
+            return self.content[line_number - 1].strip()
+        return None
+
+    def display_all_lines(self) -> None:
+        "stra todas las líneas del archivo."
+        for i, line in enumerate(self.content, 1):
+            print(f"{i}: {line.strip()}")
+
+class Menu:
+    def __init__(self, file_manager: FileManager):
+        self.file_manager = file_manager
+
+    def display_menu(self) -> None:
+        "Muestra el menú principal."
+        print("\n--- Menú Principal ---")
+        print("1. Escribir notas en el archivo")
+        print("2. Leer todo el archivo")
+        print("3. Leer una línea específica")
+        print("4. Salir")
+
+    def run(self) -> None:
+        """Ejecuta el menú interactivo."""
+        while True:
+            self.display_menu()
+            choice = input("Seleccione una opción: ")
+
+            if choice == '1':
+                self.file_manager.write_to_file()
+            elif choice == '2':
+                self.read_all_lines()
+            elif choice == '3':
+                self.read_specific_line()
+            elif choice == '4':
+                print("¡Hasta luego!")
+                break
+            else:
+                print("Opción no válida. Intente de nuevo.")
+
+    def read_all_lines(self) -> None:
+        "Lee y muestra todas las líneas del archivo."
+        self.file_manager.read_file()
+        self.file_manager.display_all_lines()
+
+    def read_specific_line(self) -> None:
+        "Permite al usuario leer una línea específica del archivo."
+        self.file_manager.read_file()
+        while True:
+            try:
+                line_number = int(input("Ingrese el número de línea que desea leer (0 para volver): "))
+                if line_number == 0:
+                    break
+                line = self.file_manager.display_line(line_number)
+                if line:
+                    print(f"Línea {line_number}: {line}")
+                else:
+                    print("Número de línea fuera de rango.")
+            except ValueError:
+                print("Por favor, ingrese un número válido.")
+
+def main():
+    filename = 'my_notes.txt'
+    file_manager = FileManager(filename)
+    menu = Menu(file_manager)
+    menu.run()
+
+if __name__ == "__main__":
+    main()
